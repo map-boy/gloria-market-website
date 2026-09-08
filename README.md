@@ -11,8 +11,27 @@ React + TypeScript + Vite + Tailwind, with Firebase for login, data and files.
 
 | Route | What it is |
 | --- | --- |
-| `/` | The public shop page |
+| `/` | The shop, or search results with `?q=` |
+| `/product/<id>` | One product, with its gallery and add to basket |
+| `/cart` | The basket, total, and the WhatsApp order |
 | `/admin` | Google sign-in, then the admin panel |
+
+## What a shopper can do
+
+- **Search** — a box in the header filters every product by name, description or
+  section. The query lives in the address bar as `?q=`, so a result list can be
+  shared or reloaded.
+- **Browse** — products sit two to a row on a phone, each showing its picture,
+  price, old price, how many are left and which section it belongs to.
+- **Open a product** — its own page at `/product/<id>` with the full picture and
+  video gallery, description, stock, and a **Copy link to share** button.
+- **Choose a quantity and add to the basket** — the basket lives in the
+  shopper's browser and survives a reload. The header shows a running count.
+- **Order** — the basket adds everything up and hands it to WhatsApp as a
+  written order. Mobile money details sit beside it.
+
+WhatsApp and the payment code also sit in a strip under the search box, so
+nobody has to scroll to find them.
 
 ## Nothing is hardcoded
 
@@ -21,11 +40,12 @@ page with a "this shop is being set up" note. Every part of the page appears
 only once the admin fills it in, and disappears again if they clear it:
 
 - Notice bar, logo, shop name, tagline
+- WhatsApp number, payment label and code, currency
 - Top banner — label, title, text, picture or video, two buttons
 - **Sections** — the admin creates them and names them (Shoes, Bags, In the
   shop, anything). A section starts empty with just its title.
-- **Items** inside a section — name, prices, corner label, description, and as
-  many pictures and videos as they want
+- **Items** inside a section — name, price, old price, how many are in stock,
+  corner label, description, and as many pictures and videos as they want
 - Highlights strip, about text, contact details, social links, footer note
 
 ## Admin panel
@@ -65,15 +85,17 @@ In the [Firebase console](https://console.firebase.google.com):
 cp .env.example .env
 ```
 
-Fill in the Firebase values, and set `VITE_OWNER_EMAIL` to the Google account
-that owns the shop. That account always has admin access and is the only one
-that can add or remove other admins. If `.env` is missing, the site shows a
-setup notice instead of a blank page.
+Fill in the Firebase values. The two accounts that always have admin access —
+the owner (`dprime2002@gmail.com`) and the developer (`techubwenge@gmail.com`)
+— are built into `src/lib/config.ts`, so the optional variables can be left
+blank. If `.env` is missing entirely, the site shows a setup notice instead of
+a blank page.
 
 ### 3. Security rules
 
-Open `firestore.rules` and `storage.rules` and set `ownerEmail()` in **both**
-files to the same lowercase email as `VITE_OWNER_EMAIL`. Then deploy them:
+The rules are what actually grant access — the app's own check is only there
+to show a friendlier screen. Both `firestore.rules` and `storage.rules` carry
+the same `adminEmails()` list as `src/lib/config.ts`. Deploy them:
 
 ```bash
 npx firebase deploy --only firestore:rules,storage
@@ -93,11 +115,38 @@ npm run dev
 Open `/admin`, sign in with the owner Google account, and start filling in the
 page.
 
-## Adding another admin
+## Who can edit the site
 
-Owner signs in → **Team** → enter their Google email → they sign in at `/admin`
-with that account. Remove them from the same screen and access stops
-immediately.
+Two kinds of admin:
+
+- **Built-in** — the owner (`dprime2002@gmail.com`) and the developer
+  (`techubwenge@gmail.com`). They always have access, are listed in
+  `adminEmails()` in both rules files, and cannot be removed from the panel.
+- **Added** — anyone a built-in admin adds on the **Team** screen. They sign in
+  at `/admin` with that Google account and can edit everything, but cannot give
+  access to anyone else. Remove them from the same screen and access stops
+  immediately.
+
+To add someone: sign in → **Team** → type their Google email → **Add person**.
+Nothing needs redeploying; it takes effect straight away.
+
+Changing the built-in list means editing `src/lib/config.ts` **and**
+`adminEmails()` in both rules files, then redeploying the rules. Adding someone
+from the Team screen needs none of that.
+
+## Prices and stock
+
+Prices are stored as plain numbers so the basket can add them up; the currency
+in **Brand & bar** (`RWF` by default) is put in front of them everywhere. Stock
+is a number too — at `0` the product shows as out of stock and cannot be added
+to a basket.
+
+## The site name
+
+`D prime Rwanda LTD` is the starting name — it is the browser tab title and
+what shows in the header, footer and admin sidebar. It is only a fallback:
+whatever the admin types under **Brand & bar** replaces it everywhere, and the
+tab title follows along.
 
 ## Deploy
 
@@ -107,8 +156,15 @@ npx firebase deploy
 ```
 
 Hosting serves `dist` and rewrites all routes to `index.html`, so `/admin`
-works on a hard refresh. Add your live domain under **Authentication → Settings
-→ Authorized domains**, or Google sign-in is rejected there.
+works on a hard refresh. `vercel.json` does the same for Vercel — without that
+rewrite, refreshing `/admin` returns the host's own 404 before the app loads.
+
+On Vercel, set the same `VITE_*` variables from `.env.example` under **Project
+settings → Environment variables**, then redeploy — a build without them ships
+the setup notice instead of the site.
+
+Whichever host you use, add the live domain under **Authentication → Settings →
+Authorized domains** in Firebase, or Google sign-in is rejected there.
 
 ## Data
 
@@ -116,7 +172,7 @@ works on a hard refresh. Add your live domain under **Authentication → Setting
 | --- | --- |
 | `settings/site` | One document with everything outside the sections |
 | `sections` | Section title, subtitle, picture, columns, visible, order |
-| `products` | Items, each with a `media` array of pictures and videos |
+| `products` | Items, each with a `media` array, a numeric price and stock |
 | `highlights` | The promises strip |
 | `admins` | One document per extra admin, keyed by lowercase email |
 

@@ -3,9 +3,14 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Must match ownerEmail() in firestore.rules and VITE_OWNER_EMAIL.
-    function ownerEmail() {
-      return 'owner@example.com';
+    // Must match adminEmails() in firestore.rules and src/lib/config.ts.
+    function adminEmails() {
+      // These accounts always have access. Everyone else is added from the
+      // Team screen instead, which needs no redeploy.
+      return [
+        'techubwenge@gmail.com',  // developer
+        'dprime2002@gmail.com'    // owner
+      ];
     }
 
     function callerEmail() {
@@ -16,7 +21,7 @@ service firebase.storage {
 
     function isAdmin() {
       return callerEmail() != '' &&
-        (callerEmail() == ownerEmail() ||
+        (callerEmail() in adminEmails() ||
          firestore.exists(/databases/(default)/documents/admins/$(callerEmail())));
     }
 

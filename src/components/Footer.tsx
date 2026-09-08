@@ -1,6 +1,7 @@
 import { Clock, Mail, MapPin, Phone } from 'lucide-react'
 import type { SiteSettings } from '../types'
 import { SOCIAL_KEYS } from '../lib/icons'
+import { SITE_NAME } from '../lib/config'
 import SocialIcon from './SocialIcon'
 
 function socialHref(key: string, value: string) {
@@ -24,7 +25,7 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid gap-8 md:grid-cols-2">
           <div>
-            <p className="font-display text-xl font-bold text-white">{settings.siteName || 'Your shop name'}</p>
+            <p className="font-display text-xl font-bold text-white">{settings.siteName || SITE_NAME}</p>
             {settings.tagline && <p className="mt-1 text-sm text-ink-400">{settings.tagline}</p>}
             {settings.footerNote && (
               <p className="mt-4 max-w-sm whitespace-pre-line text-sm text-ink-400">{settings.footerNote}</p>
@@ -67,7 +68,7 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
         </div>
 
         <p className="mt-10 border-t border-white/10 pt-6 text-xs text-ink-400">
-          © {new Date().getFullYear()} {settings.siteName || 'Your shop name'}. All rights reserved.
+          © {new Date().getFullYear()} {settings.siteName || SITE_NAME}. All rights reserved.
         </p>
       </div>
     </footer>

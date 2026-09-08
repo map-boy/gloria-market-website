@@ -3,7 +3,7 @@ import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestor
 import { Plus } from 'lucide-react'
 import { db } from '../../lib/firebase'
 import { deleteMedia } from '../../lib/storage'
-import { useProducts, useSections } from '../../hooks/useFirestore'
+import { useProducts, useSections, useSiteSettings } from '../../hooks/useFirestore'
 import type { Product, Section } from '../../types'
 import SectionCard from '../SectionCard'
 import { Button, Card, EmptyHint, Input, PanelHeader } from '../ui'
@@ -12,6 +12,7 @@ import { useToast } from '../Toast'
 export default function SectionsPanel() {
   const { sections, loading } = useSections()
   const { bySection } = useProducts()
+  const { settings } = useSiteSettings()
   const [title, setTitle] = useState('')
   const [adding, setAdding] = useState(false)
   const toast = useToast()
@@ -101,6 +102,7 @@ export default function SectionsPanel() {
               key={s.id}
               section={s}
               products={bySection.get(s.id) ?? []}
+              currency={settings.currency}
               index={i}
               total={sections.length}
               onMove={moveSection}
