@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { deleteDoc, doc, setDoc } from 'firebase/firestore'
-import { Crown, Plus, Trash2 } from 'lucide-react'
+import { Plus, ShieldCheck, Trash2 } from 'lucide-react'
 import { db } from '../../lib/firebase'
 import { useAuth } from '../../context/AuthContext'
-import { OWNER_EMAIL } from '../../lib/config'
+import { PERMANENT_ADMINS, isPermanentAdmin, permanentRole } from '../../lib/config'
 import { useAdmins } from '../../hooks/useFirestore'
 import { Button, Card, EmptyHint, Field, IconButton, Input, PanelHeader } from '../ui'
 import { useToast } from '../Toast'
@@ -11,10 +11,13 @@ import { useToast } from '../Toast'
 export default function TeamPanel() {
   const { user } = useAuth()
   const { admins, loading } = useAdmins(true)
-  const isOwner = (user?.email ?? '').toLowerCase() === OWNER_EMAIL
   const [email, setEmail] = useState('')
   const [adding, setAdding] = useState(false)
   const toast = useToast()
+
+  /** Only built-in admins hand out access, so nobody added here can quietly
+   *  widen the circle. */
+  const canManage = isPermanentAdmin(user?.email)
 
   const add = async (e: FormEvent) => {
     e.preventDefault()
@@ -23,8 +26,12 @@ export default function TeamPanel() {
       toast('That does not look like an email address.', 'error')
       return
     }
-    if (clean === OWNER_EMAIL) {
-      toast('That account is already the owner.', 'error')
+    if (isPermanentAdmin(clean)) {
+      toast('That account already has permanent access.', 'error')
+      return
+    }
+    if (admins.some((a) => a.id === clean)) {
+      toast('That person is already on the list.', 'error')
       return
     }
     setAdding(true)
@@ -35,16 +42,16 @@ export default function TeamPanel() {
         addedBy: user?.email ?? '',
       })
       setEmail('')
-      toast('Added. They can now sign in with Google.')
+      toast('Added. They can sign in with Google now.')
     } catch {
-      toast('Could not add that person.', 'error')
+      toast('Could not add that person. Check the security rules are deployed.', 'error')
     } finally {
       setAdding(false)
     }
   }
 
   const remove = async (id: string) => {
-    if (!confirm(`Remove ${id}? They will lose access immediately.`)) return
+    if (!confirm(`Remove ${id}? They lose access immediately.`)) return
     try {
       await deleteDoc(doc(db, 'admins', id))
       toast('Access removed.')
@@ -56,50 +63,63 @@ export default function TeamPanel() {
   return (
     <>
       <PanelHeader
-        title="Team"
-        description="Anyone listed here can sign in with Google and edit the site. Nobody else can."
+        title="Who can edit this site"
+        description="Everyone listed here signs in with Google at /admin. Nobody else can change anything."
       />
 
-      {!isOwner && (
+      {!canManage && (
         <p className="mb-5 rounded-2xl border border-sand-200 bg-sand-50 px-4 py-3 text-sm text-ink-600">
-          Only the shop owner can add or remove people. You can see the list below.
+          You can edit the site, but only the owner or developer can give access to someone new.
         </p>
       )}
 
-      <Card title="Give someone access">
+      <Card
+        title="Give someone access"
+        description="Type their Google email and they can sign in straight away."
+      >
         <form onSubmit={add} className="space-y-4">
-          <Field label="Their Google email" hint="It must be the address on their Google account.">
+          <Field label="Their Google email" hint="Must be the address on their Google account.">
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@gmail.com"
-              disabled={!isOwner}
+              disabled={!canManage}
             />
           </Field>
-          <Button type="submit" busy={adding} disabled={!isOwner || !email.trim()}>
+          <Button type="submit" busy={adding} disabled={!canManage || !email.trim()}>
             <Plus size={16} /> Add person
           </Button>
         </form>
       </Card>
 
-      <div className="mt-5 space-y-2">
-        {OWNER_EMAIL && (
-          <div className="flex items-center gap-3 rounded-2xl border border-sand-200 bg-sand-50 p-3.5">
+      <h2 className="mb-3 mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-ink-400">
+        Always has access
+      </h2>
+      <div className="space-y-2">
+        {PERMANENT_ADMINS.map((e) => (
+          <div key={e} className="flex items-center gap-3 rounded-2xl border border-sand-200 bg-sand-50 p-3.5">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sand-400 text-ink-950">
-              <Crown size={16} />
+              <ShieldCheck size={16} />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate font-medium text-ink-900">{OWNER_EMAIL}</p>
-              <p className="text-xs text-ink-400">Owner · always has access</p>
+              <p className="truncate font-medium text-ink-900">{e}</p>
+              <p className="text-xs text-ink-400">
+                {permanentRole(e)} · built in, cannot be removed here
+              </p>
             </div>
           </div>
-        )}
+        ))}
+      </div>
 
+      <h2 className="mb-3 mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-ink-400">
+        Added by you
+      </h2>
+      <div className="space-y-2">
         {loading ? (
           <p className="text-sm text-ink-400">Loading…</p>
         ) : admins.length === 0 ? (
-          <EmptyHint>No extra people yet. Only the owner can edit the site.</EmptyHint>
+          <EmptyHint>Nobody added yet. Use the box above to let someone else post pictures.</EmptyHint>
         ) : (
           admins.map((a) => (
             <div key={a.id} className="flex items-center gap-3 rounded-2xl border border-ink-100 bg-white p-3.5">
@@ -110,7 +130,7 @@ export default function TeamPanel() {
                 <p className="truncate font-medium text-ink-900">{a.id}</p>
                 {a.addedBy && <p className="truncate text-xs text-ink-400">Added by {a.addedBy}</p>}
               </div>
-              <IconButton label="Remove access" tone="danger" disabled={!isOwner} onClick={() => remove(a.id)}>
+              <IconButton label="Remove access" tone="danger" disabled={!canManage} onClick={() => remove(a.id)}>
                 <Trash2 size={16} />
               </IconButton>
             </div>

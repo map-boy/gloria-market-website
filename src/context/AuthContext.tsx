@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { onAuthStateChanged, signInWithPopup, signOut, type User } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
 import { auth, db, googleProvider } from '../lib/firebase'
-import { OWNER_EMAIL } from '../lib/config'
+import { isPermanentAdmin } from '../lib/config'
 
 interface AuthContextValue {
   user: User | null
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return
       }
       const email = (u.email || '').toLowerCase()
-      if (email && email === OWNER_EMAIL) {
+      if (isPermanentAdmin(email)) {
         setIsAdmin(true)
       } else if (!email) {
         setIsAdmin(false)

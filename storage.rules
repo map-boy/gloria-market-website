@@ -3,9 +3,12 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Must match ownerEmail() in firestore.rules and VITE_OWNER_EMAIL.
-    function ownerEmail() {
-      return 'owner@example.com';
+    // Must match adminEmails() in firestore.rules and src/lib/config.ts.
+    function adminEmails() {
+      return [
+        'techubwenge@gmail.com',  // developer — keep this one
+        'owner@example.com'       // <- replace with the shop owner's Google email
+      ];
     }
 
     function callerEmail() {
@@ -16,7 +19,7 @@ service firebase.storage {
 
     function isAdmin() {
       return callerEmail() != '' &&
-        (callerEmail() == ownerEmail() ||
+        (callerEmail() in adminEmails() ||
          firestore.exists(/databases/(default)/documents/admins/$(callerEmail())));
     }
 

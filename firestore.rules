@@ -3,11 +3,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Set this to the Google account that owns the shop. It is the only
-    // account that can grant access to anyone else, and it matches
-    // VITE_OWNER_EMAIL in the site's .env file. Keep it lowercase.
-    function ownerEmail() {
-      return 'owner@example.com';
+    // Accounts that always have admin access. Keep these in step with
+    // src/lib/config.ts. Lowercase only.
+    function adminEmails() {
+      return [
+        'techubwenge@gmail.com',  // developer — keep this one
+        'owner@example.com'       // <- replace with the shop owner's Google email
+      ];
     }
 
     function callerEmail() {
@@ -16,14 +18,14 @@ service cloud.firestore {
         : '';
     }
 
-    function isOwner() {
-      return callerEmail() != '' && callerEmail() == ownerEmail();
+    // Built-in admins are the only ones who can hand out access.
+    function isPermanentAdmin() {
+      return callerEmail() != '' && callerEmail() in adminEmails();
     }
 
-    // An admin is the owner, or anyone with a document in /admins keyed by
-    // their lowercase email.
+    // Anyone built in, or anyone added from the Team screen.
     function isAdmin() {
-      return isOwner() ||
+      return isPermanentAdmin() ||
         (callerEmail() != '' &&
          exists(/databases/$(database)/documents/admins/$(callerEmail())));
     }
@@ -47,12 +49,12 @@ service cloud.firestore {
     }
 
     // The allow list is never public. A signed-in user may read their own
-    // entry so the app can tell them whether they have access; only admins
-    // can see the whole list, and only the owner can change it.
+    // entry so the app can tell them whether they have access; admins see the
+    // whole list, and only built-in admins can change it.
     match /admins/{email} {
       allow get: if request.auth != null && (email == callerEmail() || isAdmin());
       allow list: if isAdmin();
-      allow write: if isOwner();
+      allow write: if isPermanentAdmin();
     }
   }
 }
