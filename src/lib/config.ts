@@ -1,20 +1,21 @@
-/** Accounts that always have admin access, whatever is in the database.
- *  Everyone else is added from the Team screen and can be removed again. */
+/** Accounts that always have admin access, whatever is in the database, and
+ *  the name the site falls back to before anything is filled in. */
 
-/** The developer's account. Built in so the site can always be maintained,
- *  even before any environment variables are set. */
+/** The developer's account, so the site can always be maintained. */
 export const DEVELOPER_EMAIL = 'techubwenge@gmail.com'
 
-/** The shop owner's Google account, from .env. One address, or several
- *  separated by commas. */
-const ownerEmails = (import.meta.env.VITE_OWNER_EMAIL || '')
+/** The business owner's account. */
+export const OWNER_EMAIL = 'dprime2002@gmail.com'
+
+/** Extra permanent admins from .env — one address, or several separated by
+ *  commas. Anyone else is added from the Team screen instead. */
+const envAdmins = (import.meta.env.VITE_ADMIN_EMAILS || '')
   .split(',')
   .map((e: string) => e.trim().toLowerCase())
   .filter(Boolean)
 
-/** Built-in admins: the developer plus whoever is named in .env. */
 export const PERMANENT_ADMINS: string[] = [
-  ...new Set([DEVELOPER_EMAIL, ...ownerEmails]),
+  ...new Set([DEVELOPER_EMAIL, OWNER_EMAIL, ...envAdmins]),
 ]
 
 export function isPermanentAdmin(email: string | null | undefined): boolean {
@@ -23,6 +24,12 @@ export function isPermanentAdmin(email: string | null | undefined): boolean {
 }
 
 /** Used only to label a row in the Team screen. */
-export function permanentRole(email: string): 'Developer' | 'Owner' {
-  return email === DEVELOPER_EMAIL ? 'Developer' : 'Owner'
+export function permanentRole(email: string): string {
+  if (email === DEVELOPER_EMAIL) return 'Developer'
+  if (email === OWNER_EMAIL) return 'Owner'
+  return 'Admin'
 }
+
+/** Shown until the admin sets a name of their own under Brand. Firestore
+ *  always wins — this is only the starting point. */
+export const SITE_NAME = (import.meta.env.VITE_SITE_NAME || 'D prime Rwanda LTD').trim()

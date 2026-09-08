@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { ChevronLeft, ExternalLink, LifeBuoy, LogOut, ShoppingBag, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { NAV, NAV_GROUPS, type PanelId } from './nav'
+import { SITE_NAME } from '../lib/config'
 
 interface Props {
   active: PanelId
@@ -62,7 +63,7 @@ export default function Sidebar({
           </span>
           {!collapsed && (
             <div className="min-w-0 flex-1">
-              <p className="truncate font-semibold text-white">{siteName || 'Your shop'}</p>
+              <p className="truncate font-semibold text-white">{siteName || SITE_NAME}</p>
               <p className="flex items-center gap-1.5 text-[11px] text-ink-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Live
               </p>

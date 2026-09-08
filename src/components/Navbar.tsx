@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Menu, ShoppingBag, X } from 'lucide-react'
 import type { Section, SiteSettings } from '../types'
+import { SITE_NAME } from '../lib/config'
 
 export default function Navbar({ settings, sections }: { settings: SiteSettings; sections: Section[] }) {
   const [open, setOpen] = useState(false)
@@ -19,7 +20,7 @@ export default function Navbar({ settings, sections }: { settings: SiteSettings;
           )}
           <span className="flex flex-col leading-tight">
             <span className="font-display text-lg font-bold text-ink-900">
-              {settings.siteName || 'Your shop name'}
+              {settings.siteName || SITE_NAME}
             </span>
             {settings.tagline && (
               <span className="text-[10px] uppercase tracking-[0.18em] text-ink-400">{settings.tagline}</span>

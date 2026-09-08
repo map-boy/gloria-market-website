@@ -65,18 +65,17 @@ In the [Firebase console](https://console.firebase.google.com):
 cp .env.example .env
 ```
 
-Fill in the Firebase values. `VITE_OWNER_EMAIL` is the shop owner's Google
-account — it always has admin access and can give access to other people. It
-can be left blank, because the developer account (`techubwenge@gmail.com`) is
-built into `src/lib/config.ts` and always has access. If `.env` is missing
-entirely, the site shows a setup notice instead of a blank page.
+Fill in the Firebase values. The two accounts that always have admin access —
+the owner (`dprime2002@gmail.com`) and the developer (`techubwenge@gmail.com`)
+— are built into `src/lib/config.ts`, so the optional variables can be left
+blank. If `.env` is missing entirely, the site shows a setup notice instead of
+a blank page.
 
 ### 3. Security rules
 
-Open `firestore.rules` and `storage.rules`. Both contain an `adminEmails()`
-list — replace the `owner@example.com` placeholder with the shop owner's Google
-email, keep the developer address, and make the two files match each other and
-`VITE_OWNER_EMAIL`. Then deploy them:
+The rules are what actually grant access — the app's own check is only there
+to show a friendlier screen. Both `firestore.rules` and `storage.rules` carry
+the same `adminEmails()` list as `src/lib/config.ts`. Deploy them:
 
 ```bash
 npx firebase deploy --only firestore:rules,storage
@@ -100,9 +99,9 @@ page.
 
 Two kinds of admin:
 
-- **Built-in** — the developer (`techubwenge@gmail.com`) and whoever is named
-  in `VITE_OWNER_EMAIL`. They always have access, are listed in `adminEmails()`
-  in the rules, and cannot be removed from the panel.
+- **Built-in** — the owner (`dprime2002@gmail.com`) and the developer
+  (`techubwenge@gmail.com`). They always have access, are listed in
+  `adminEmails()` in both rules files, and cannot be removed from the panel.
 - **Added** — anyone a built-in admin adds on the **Team** screen. They sign in
   at `/admin` with that Google account and can edit everything, but cannot give
   access to anyone else. Remove them from the same screen and access stops
@@ -112,7 +111,15 @@ To add someone: sign in → **Team** → type their Google email → **Add perso
 Nothing needs redeploying; it takes effect straight away.
 
 Changing the built-in list means editing `src/lib/config.ts` **and**
-`adminEmails()` in both rules files, then redeploying the rules.
+`adminEmails()` in both rules files, then redeploying the rules. Adding someone
+from the Team screen needs none of that.
+
+## The site name
+
+`D prime Rwanda LTD` is the starting name — it is the browser tab title and
+what shows in the header, footer and admin sidebar. It is only a fallback:
+whatever the admin types under **Brand & bar** replaces it everywhere, and the
+tab title follows along.
 
 ## Deploy
 

@@ -1,4 +1,5 @@
 import type { MediaItem } from '../../types'
+import { SITE_NAME } from '../../lib/config'
 import MediaPicker from '../MediaPicker'
 import { Card, Field, Input, PanelHeader, SaveBar } from '../ui'
 import { useSettingsDraft } from '../useSettingsDraft'
@@ -24,11 +25,11 @@ export default function BrandPanel() {
 
       <div className="space-y-5">
         <Card title="Shop identity">
-          <Field label="Shop name">
+          <Field label="Shop name" hint={`Left blank, the site shows "${SITE_NAME}".`}>
             <Input
               value={draft.siteName}
               onChange={(e) => set('siteName', e.target.value)}
-              placeholder="Leave blank to hide"
+              placeholder={SITE_NAME}
             />
           </Field>
           <Field label="Tagline" hint="A few words under the name, e.g. what you sell.">

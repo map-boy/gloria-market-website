@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import { useSections, useHighlights, useProducts, useSiteSettings } from '../hooks/useFirestore'
+import { SITE_NAME } from '../lib/config'
 import Navbar from '../components/Navbar'
 import Hero from '../components/Hero'
 import CategoryStrip from '../components/CategoryStrip'
@@ -14,6 +16,12 @@ export default function Home() {
   const { highlights } = useHighlights()
 
   const visibleSections = sections.filter((s) => s.visible !== false)
+  const name = settings.siteName || SITE_NAME
+
+  // Keep the browser tab in step with the name the admin chose.
+  useEffect(() => {
+    document.title = settings.tagline ? `${name} — ${settings.tagline}` : name
+  }, [name, settings.tagline])
 
   return (
     <div id="top" className="min-h-screen bg-white">
