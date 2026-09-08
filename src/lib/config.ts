@@ -33,3 +33,13 @@ export function permanentRole(email: string): string {
 /** Shown until the admin sets a name of their own under Brand. Firestore
  *  always wins — this is only the starting point. */
 export const SITE_NAME = (import.meta.env.VITE_SITE_NAME || 'D prime Rwanda LTD').trim()
+
+/** The number the shop starts with, so orders can reach someone before the
+ *  admin has filled anything in. Whatever they set under Brand replaces it. */
+export const DEFAULT_WHATSAPP = '+250 786 610 748'
+
+/** The number in use: whatever the admin set, else the built-in one. */
+export function shopWhatsapp(configured: string | undefined): string {
+  const clean = (configured ?? '').trim()
+  return clean || DEFAULT_WHATSAPP
+}

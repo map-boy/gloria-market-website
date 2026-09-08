@@ -3,8 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Check, Link2, Minus, Plus, ShoppingCart } from 'lucide-react'
 import { useProducts, useSections, useSiteSettings } from '../hooks/useFirestore'
 import { useCart } from '../context/CartContext'
-import { formatPrice, whatsappDigits } from '../lib/format'
-import { SITE_NAME } from '../lib/config'
+import { formatPrice, whatsappLink } from '../lib/format'
+import { SITE_NAME, shopWhatsapp } from '../lib/config'
 import MediaFrame from '../components/MediaFrame'
 import Lightbox from '../components/Lightbox'
 import SocialIcon from '../components/SocialIcon'
@@ -72,11 +72,10 @@ export default function ProductPage() {
     setTimeout(() => setAdded(false), 2000)
   }
 
-  const orderText = encodeURIComponent(
+  const orderMessage =
     `Hello ${name}, I would like to order:\n\n${product.name}\nQuantity: ${quantity}` +
     (price ? `\nPrice: ${price}` : '') +
-    `\n\n${window.location.href}`,
-  )
+    `\n\n${window.location.href}`
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
@@ -176,9 +175,9 @@ export default function ProductPage() {
               {added ? 'Added to basket' : 'Add to basket'}
             </button>
 
-            {settings.whatsappNumber && (
+            {(
               <a
-                href={`https://wa.me/${whatsappDigits(settings.whatsappNumber)}?text=${orderText}`}
+                href={whatsappLink(shopWhatsapp(settings.whatsappNumber), orderMessage)}
                 target="_blank"
                 rel="noreferrer noopener"
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-500 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-emerald-600"

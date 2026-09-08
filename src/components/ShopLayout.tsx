@@ -3,7 +3,6 @@ import { Outlet } from 'react-router-dom'
 import { useSections, useSiteSettings } from '../hooks/useFirestore'
 import { SITE_NAME } from '../lib/config'
 import Navbar from './Navbar'
-import ContactBar from './ContactBar'
 import Footer from './Footer'
 
 /** Header, contact bar and footer stay put while the page inside changes, so
@@ -27,7 +26,6 @@ export default function ShopLayout() {
       )}
 
       <Navbar settings={settings} sections={visibleSections} />
-      <ContactBar settings={settings} />
 
       <main className="flex-1">
         <Outlet />

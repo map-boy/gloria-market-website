@@ -19,3 +19,8 @@ export function parsePrice(value: string | number | undefined | null): number {
 export function whatsappDigits(value: string): string {
   return value.replace(/[^0-9]/g, '')
 }
+
+/** Builds a wa.me link with the message already written out. */
+export function whatsappLink(number: string, message: string): string {
+  return `https://wa.me/${whatsappDigits(number)}?text=${encodeURIComponent(message)}`
+}

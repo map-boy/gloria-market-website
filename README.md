@@ -30,8 +30,9 @@ React + TypeScript + Vite + Tailwind, with Firebase for login, data and files.
 - **Order** — the basket adds everything up and hands it to WhatsApp as a
   written order. Mobile money details sit beside it.
 
-WhatsApp and the payment code also sit in a strip under the search box, so
-nobody has to scroll to find them.
+WhatsApp and the payment code sit beside the basket button at the top of every
+page. The whole block is one tap through to a WhatsApp chat with the shop, with
+the first line of the message already written.
 
 ## Nothing is hardcoded
 
@@ -40,7 +41,7 @@ page with a "this shop is being set up" note. Every part of the page appears
 only once the admin fills it in, and disappears again if they clear it:
 
 - Notice bar, logo, shop name, tagline
-- WhatsApp number, payment label and code, currency
+- WhatsApp number and its small note, payment label and code, currency
 - Top banner — label, title, text, picture or video, two buttons
 - **Sections** — the admin creates them and names them (Shoes, Bags, In the
   shop, anything). A section starts empty with just its title.
@@ -140,6 +141,13 @@ Prices are stored as plain numbers so the basket can add them up; the currency
 in **Brand & bar** (`RWF` by default) is put in front of them everywhere. Stock
 is a number too — at `0` the product shows as out of stock and cannot be added
 to a basket.
+
+## The WhatsApp number
+
+Orders go to `+250 786 610 748` until an admin sets a different one under
+**Brand & bar**, in the same way the site name works. It is used by the header
+block, the **Order on WhatsApp** button on a product, and the basket's order
+message.
 
 ## The site name
 
