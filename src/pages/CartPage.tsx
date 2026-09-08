@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft, Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react'
 import { useProducts, useSiteSettings } from '../hooks/useFirestore'
 import { useCart } from '../context/CartContext'
-import { formatPrice, whatsappDigits } from '../lib/format'
-import { SITE_NAME } from '../lib/config'
+import { formatPrice, whatsappLink } from '../lib/format'
+import { SITE_NAME, shopWhatsapp } from '../lib/config'
 import MediaFrame from '../components/MediaFrame'
 import SocialIcon from '../components/SocialIcon'
 
@@ -20,13 +20,12 @@ export default function CartPage() {
   const total = rows.reduce((sum, r) => sum + r.product.price * r.line.quantity, 0)
   const name = settings.siteName || SITE_NAME
 
-  const orderText = encodeURIComponent(
+  const orderMessage =
     `Hello ${name}, I would like to order:\n\n` +
     rows.map((r) => `• ${r.product.name} × ${r.line.quantity}` +
       (r.product.price ? ` — ${formatPrice(r.product.price * r.line.quantity, settings.currency)}` : ''))
       .join('\n') +
-    (total > 0 ? `\n\nTotal: ${formatPrice(total, settings.currency)}` : ''),
-  )
+    (total > 0 ? `\n\nTotal: ${formatPrice(total, settings.currency)}` : '')
 
   if (loading) return <p className="py-24 text-center text-sm text-ink-400">Loading…</p>
 
@@ -128,9 +127,9 @@ export default function CartPage() {
             </div>
           )}
 
-          {settings.whatsappNumber && (
+          {(
             <a
-              href={`https://wa.me/${whatsappDigits(settings.whatsappNumber)}?text=${orderText}`}
+              href={whatsappLink(shopWhatsapp(settings.whatsappNumber), orderMessage)}
               target="_blank"
               rel="noreferrer noopener"
               className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-4 text-sm font-semibold text-white transition hover:bg-emerald-600"

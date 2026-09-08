@@ -5,6 +5,7 @@ import type { Section, SiteSettings } from '../types'
 import { SITE_NAME } from '../lib/config'
 import { useCart } from '../context/CartContext'
 import SearchBar from './SearchBar'
+import HeaderContact from './HeaderContact'
 
 export default function Navbar({ settings, sections }: { settings: SiteSettings; sections: Section[] }) {
   const [open, setOpen] = useState(false)
@@ -16,23 +17,23 @@ export default function Navbar({ settings, sections }: { settings: SiteSettings;
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <button
             onClick={() => setOpen((v) => !v)}
-            className="rounded-lg p-2 text-ink-600 transition hover:bg-ink-50 md:hidden"
+            className="-ml-1 rounded-lg p-1.5 text-ink-600 transition hover:bg-ink-50 md:hidden"
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
           >
-            {open ? <X size={22} /> : <Menu size={22} />}
+            {open ? <X size={20} /> : <Menu size={20} />}
           </button>
 
-          <Link to="/" className="flex min-w-0 items-center gap-2.5">
+          <Link to="/" className="flex min-w-0 flex-1 items-center gap-2">
             {settings.logoUrl ? (
-              <img src={settings.logoUrl} alt="" className="h-9 w-9 shrink-0 rounded-lg object-cover" />
+              <img src={settings.logoUrl} alt="" className="h-8 w-8 shrink-0 rounded-lg object-cover sm:h-9 sm:w-9" />
             ) : (
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ink-900 text-white">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink-900 text-white sm:h-9 sm:w-9">
                 <ShoppingBag size={18} />
               </span>
             )}
             <span className="flex min-w-0 flex-col leading-tight">
-              <span className="truncate font-display text-base font-bold text-ink-900 sm:text-lg">
+              <span className="line-clamp-2 font-display text-xs font-bold leading-tight text-ink-900 sm:text-lg">
                 {settings.siteName || SITE_NAME}
               </span>
               {settings.tagline && (
@@ -43,16 +44,20 @@ export default function Navbar({ settings, sections }: { settings: SiteSettings;
             </span>
           </Link>
 
-          <Link
-            to="/cart"
-            className="relative shrink-0 rounded-lg p-2 text-ink-700 transition hover:bg-ink-50"
-            aria-label={`Basket, ${count} item${count === 1 ? '' : 's'}`}
-          >
-            <ShoppingCart size={22} />
-            <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-ink-900 px-1 text-[10px] font-bold text-white">
-              {count}
-            </span>
-          </Link>
+          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
+            <HeaderContact settings={settings} />
+
+            <Link
+              to="/cart"
+              className="relative shrink-0 rounded-lg p-2 text-ink-700 transition hover:bg-ink-50"
+              aria-label={`Basket, ${count} item${count === 1 ? '' : 's'}`}
+            >
+              <ShoppingCart size={22} />
+              <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-ink-900 px-1 text-[10px] font-bold text-white">
+                {count}
+              </span>
+            </Link>
+          </div>
         </div>
       </div>
 

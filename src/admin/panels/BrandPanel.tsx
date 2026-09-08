@@ -1,5 +1,5 @@
 import type { MediaItem } from '../../types'
-import { SITE_NAME } from '../../lib/config'
+import { DEFAULT_WHATSAPP, SITE_NAME } from '../../lib/config'
 import MediaPicker from '../MediaPicker'
 import { Card, Field, Input, PanelHeader, SaveBar, Toggle } from '../ui'
 import { useSettingsDraft } from '../useSettingsDraft'
@@ -48,14 +48,24 @@ export default function BrandPanel() {
         </Card>
 
         <Card
-          title="WhatsApp & payment strip"
-          description="Sits right under the search box, so shoppers can order or pay without scrolling."
+          title="WhatsApp & payment"
+          description="Shown beside the basket button. Tapping it opens a WhatsApp chat with you."
         >
-          <Field label="WhatsApp number" hint="With the country code, e.g. +250 726 168 023.">
+          <Field
+            label="WhatsApp number"
+            hint={`With the country code. Left blank, the site uses ${DEFAULT_WHATSAPP}.`}
+          >
             <Input
               value={draft.whatsappNumber}
               onChange={(e) => set('whatsappNumber', e.target.value)}
-              placeholder="+250 700 000 000"
+              placeholder={DEFAULT_WHATSAPP}
+            />
+          </Field>
+          <Field label="Small line under the number" hint="Optional.">
+            <Input
+              value={draft.whatsappNote}
+              onChange={(e) => set('whatsappNote', e.target.value)}
+              placeholder="e.g. Order online or call us"
             />
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -77,8 +87,8 @@ export default function BrandPanel() {
           <Toggle
             checked={draft.showContactBar !== false}
             onChange={(v) => set('showContactBar', v)}
-            label="Show the strip"
-            hint="Turn off to hide it without clearing what you typed."
+            label="Show it in the header"
+            hint="Turn off to hide the block without clearing what you typed."
           />
         </Card>
 

@@ -46,8 +46,9 @@ export interface SiteSettings {
   openingHours: string
   socials: Socials
 
-  /** The strip under the search bar: WhatsApp number and mobile money code. */
+  /** The block beside the basket button: WhatsApp number and payment code. */
   whatsappNumber: string
+  whatsappNote: string
   momoCode: string
   momoName: string
   showContactBar: boolean
@@ -132,6 +133,7 @@ export const emptySettings: SiteSettings = {
   openingHours: '',
   socials: { facebook: '', instagram: '', twitter: '', tiktok: '', youtube: '', whatsapp: '' },
   whatsappNumber: '',
+  whatsappNote: '',
   momoCode: '',
   momoName: '',
   showContactBar: true,
