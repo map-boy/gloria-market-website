@@ -5,9 +5,11 @@ service firebase.storage {
 
     // Must match adminEmails() in firestore.rules and src/lib/config.ts.
     function adminEmails() {
+      // Add the shop owner's Google address here too if they should keep
+      // access even when removed from the Team screen. Everyone else is
+      // added from that screen instead, with no redeploy needed.
       return [
-        'techubwenge@gmail.com',  // developer — keep this one
-        'owner@example.com'       // <- replace with the shop owner's Google email
+        'techubwenge@gmail.com'
       ];
     }
 

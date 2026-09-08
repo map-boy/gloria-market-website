@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { isFirebaseConfigured } from './lib/firebase'
 import { ToastProvider } from './admin/Toast'
@@ -6,6 +6,7 @@ import ProtectedRoute from './admin/ProtectedRoute'
 import AdminApp from './admin/AdminApp'
 import Home from './pages/Home'
 import SetupNotice from './pages/SetupNotice'
+import NotFound from './pages/NotFound'
 
 export default function App() {
   if (!isFirebaseConfigured) return <SetupNotice />
@@ -24,7 +25,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </ToastProvider>

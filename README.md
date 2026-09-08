@@ -122,8 +122,15 @@ npx firebase deploy
 ```
 
 Hosting serves `dist` and rewrites all routes to `index.html`, so `/admin`
-works on a hard refresh. Add your live domain under **Authentication → Settings
-→ Authorized domains**, or Google sign-in is rejected there.
+works on a hard refresh. `vercel.json` does the same for Vercel — without that
+rewrite, refreshing `/admin` returns the host's own 404 before the app loads.
+
+On Vercel, set the same `VITE_*` variables from `.env.example` under **Project
+settings → Environment variables**, then redeploy — a build without them ships
+the setup notice instead of the site.
+
+Whichever host you use, add the live domain under **Authentication → Settings →
+Authorized domains** in Firebase, or Google sign-in is rejected there.
 
 ## Data
 
