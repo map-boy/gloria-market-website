@@ -1,40 +1,42 @@
-import { useEffect } from 'react'
-import { useSections, useHighlights, useProducts, useSiteSettings } from '../hooks/useFirestore'
-import { SITE_NAME } from '../lib/config'
-import Navbar from '../components/Navbar'
+import { useSearchParams } from 'react-router-dom'
+import { useHighlights, useProducts, useSections, useSiteSettings } from '../hooks/useFirestore'
 import Hero from '../components/Hero'
 import CategoryStrip from '../components/CategoryStrip'
 import SectionBlock from '../components/SectionBlock'
+import SearchResults from '../components/SearchResults'
 import HighlightStrip from '../components/HighlightStrip'
 import About from '../components/About'
-import Footer from '../components/Footer'
 
 export default function Home() {
   const { settings } = useSiteSettings()
   const { sections, loading: loadingSections } = useSections()
-  const { bySection } = useProducts()
+  const { bySection, products } = useProducts()
   const { highlights } = useHighlights()
+  const [params] = useSearchParams()
 
+  const query = (params.get('q') ?? '').trim()
   const visibleSections = sections.filter((s) => s.visible !== false)
-  const name = settings.siteName || SITE_NAME
 
-  // Keep the browser tab in step with the name the admin chose.
-  useEffect(() => {
-    document.title = settings.tagline ? `${name} — ${settings.tagline}` : name
-  }, [name, settings.tagline])
+  if (query) {
+    const needle = query.toLowerCase()
+    const sectionTitle = (id: string) => sections.find((s) => s.id === id)?.title ?? ''
+    const matches = products.filter(
+      (p) =>
+        p.visible !== false &&
+        (p.name.toLowerCase().includes(needle) ||
+          p.description.toLowerCase().includes(needle) ||
+          sectionTitle(p.sectionId).toLowerCase().includes(needle)),
+    )
+    return (
+      <SearchResults query={query} products={matches} sections={sections} currency={settings.currency} />
+    )
+  }
 
   return (
-    <div id="top" className="min-h-screen bg-white">
-      {settings.announcementText && (
-        <div className="bg-ink-950 px-4 py-2 text-center text-xs font-medium text-white md:text-sm">
-          {settings.announcementText}
-        </div>
-      )}
-
-      <Navbar settings={settings} sections={visibleSections} />
+    <>
       <Hero settings={settings} />
 
-      <main id="shop">
+      <div id="shop">
         {settings.showCategoryStrip !== false && <CategoryStrip sections={visibleSections} />}
 
         {loadingSections ? (
@@ -48,15 +50,18 @@ export default function Home() {
           </div>
         ) : (
           visibleSections.map((s) => (
-            <SectionBlock key={s.id} section={s} products={bySection.get(s.id) ?? []} />
+            <SectionBlock
+              key={s.id}
+              section={s}
+              products={bySection.get(s.id) ?? []}
+              currency={settings.currency}
+            />
           ))
         )}
 
         <HighlightStrip highlights={highlights} />
         <About settings={settings} />
-      </main>
-
-      <Footer settings={settings} />
-    </div>
+      </div>
+    </>
   )
 }

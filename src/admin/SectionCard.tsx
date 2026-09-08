@@ -4,6 +4,7 @@ import {
   ArrowDown, ArrowUp, ChevronDown, Eye, EyeOff, ImagePlus, Plus, SquarePen, Trash2,
 } from 'lucide-react'
 import { db } from '../lib/firebase'
+import { formatPrice } from '../lib/format'
 import { deleteMedia, uploadMedia } from '../lib/storage'
 import type { Product, Section } from '../types'
 import MediaFrame from '../components/MediaFrame'
@@ -14,13 +15,15 @@ import { useToast } from './Toast'
 interface Props {
   section: Section
   products: Product[]
+  /** Passed down so prices read the same here as on the site. */
+  currency: string
   index: number
   total: number
   onMove: (index: number, dir: -1 | 1) => void
   onDelete: (section: Section, products: Product[]) => void
 }
 
-export default function SectionCard({ section, products, index, total, onMove, onDelete }: Props) {
+export default function SectionCard({ section, products, currency, index, total, onMove, onDelete }: Props) {
   const [open, setOpen] = useState(false)
   const [editingSection, setEditingSection] = useState(false)
   const [title, setTitle] = useState(section.title)
@@ -206,6 +209,7 @@ export default function SectionCard({ section, products, index, total, onMove, o
                 sectionId={section.id}
                 nextOrder={p.order}
                 existing={p}
+                currency={currency}
                 onDone={() => setEditingProduct(null)}
               />
             ) : (
@@ -226,8 +230,12 @@ export default function SectionCard({ section, products, index, total, onMove, o
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium text-ink-800">{p.name}</p>
                   <p className="truncate text-xs text-ink-400">
-                    {[p.price, `${p.media?.length ?? 0} file${(p.media?.length ?? 0) === 1 ? '' : 's'}`,
-                      p.visible === false ? 'hidden' : null].filter(Boolean).join(' · ')}
+                    {[
+                      formatPrice(p.price, currency),
+                      p.stock > 0 ? `${p.stock} in stock` : 'out of stock',
+                      `${p.media?.length ?? 0} file${(p.media?.length ?? 0) === 1 ? '' : 's'}`,
+                      p.visible === false ? 'hidden' : null,
+                    ].filter(Boolean).join(' · ')}
                   </p>
                 </div>
                 <IconButton label="Edit item" onClick={() => setEditingProduct(p.id)}>
@@ -244,6 +252,7 @@ export default function SectionCard({ section, products, index, total, onMove, o
             <ProductEditor
               sectionId={section.id}
               nextOrder={products.length}
+              currency={currency}
               onDone={() => setAddingProduct(false)}
             />
           ) : (
