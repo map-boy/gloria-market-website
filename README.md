@@ -11,8 +11,28 @@ React + TypeScript + Vite + Tailwind, with Firebase for login, data and files.
 
 | Route | What it is |
 | --- | --- |
-| `/` | The public shop page |
+| `/` | The shop, or search results with `?q=` |
+| `/product/<id>` | One product, with its gallery and add to basket |
+| `/cart` | The basket, total, and the WhatsApp order |
 | `/admin` | Google sign-in, then the admin panel |
+
+## What a shopper can do
+
+- **Search** — a box in the header filters every product by name, description or
+  section. The query lives in the address bar as `?q=`, so a result list can be
+  shared or reloaded.
+- **Browse** — products sit two to a row on a phone, each showing its picture,
+  price, old price, how many are left and which section it belongs to.
+- **Open a product** — its own page at `/product/<id>` with the full picture and
+  video gallery, description, stock, and a **Copy link to share** button.
+- **Choose a quantity and add to the basket** — the basket lives in the
+  shopper's browser and survives a reload. The header shows a running count.
+- **Order** — the basket adds everything up and hands it to WhatsApp as a
+  written order. Mobile money details sit beside it.
+
+WhatsApp and the payment code sit beside the basket button at the top of every
+page. The whole block is one tap through to a WhatsApp chat with the shop, with
+the first line of the message already written.
 
 ## Nothing is hardcoded
 
@@ -21,11 +41,12 @@ page with a "this shop is being set up" note. Every part of the page appears
 only once the admin fills it in, and disappears again if they clear it:
 
 - Notice bar, logo, shop name, tagline
+- WhatsApp number and its small note, payment label and code, currency
 - Top banner — label, title, text, picture or video, two buttons
 - **Sections** — the admin creates them and names them (Shoes, Bags, In the
   shop, anything). A section starts empty with just its title.
-- **Items** inside a section — name, prices, corner label, description, and as
-  many pictures and videos as they want
+- **Items** inside a section — name, price, old price, how many are in stock,
+  corner label, description, and as many pictures and videos as they want
 - Highlights strip, about text, contact details, social links, footer note
 
 ## Admin panel
@@ -114,6 +135,20 @@ Changing the built-in list means editing `src/lib/config.ts` **and**
 `adminEmails()` in both rules files, then redeploying the rules. Adding someone
 from the Team screen needs none of that.
 
+## Prices and stock
+
+Prices are stored as plain numbers so the basket can add them up; the currency
+in **Brand & bar** (`RWF` by default) is put in front of them everywhere. Stock
+is a number too — at `0` the product shows as out of stock and cannot be added
+to a basket.
+
+## The WhatsApp number
+
+Orders go to `+250 786 610 748` until an admin sets a different one under
+**Brand & bar**, in the same way the site name works. It is used by the header
+block, the **Order on WhatsApp** button on a product, and the basket's order
+message.
+
 ## The site name
 
 `D prime Rwanda LTD` is the starting name — it is the browser tab title and
@@ -145,7 +180,7 @@ Authorized domains** in Firebase, or Google sign-in is rejected there.
 | --- | --- |
 | `settings/site` | One document with everything outside the sections |
 | `sections` | Section title, subtitle, picture, columns, visible, order |
-| `products` | Items, each with a `media` array of pictures and videos |
+| `products` | Items, each with a `media` array, a numeric price and stock |
 | `highlights` | The promises strip |
 | `admins` | One document per extra admin, keyed by lowercase email |
 

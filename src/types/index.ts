@@ -46,6 +46,16 @@ export interface SiteSettings {
   openingHours: string
   socials: Socials
 
+  /** The block beside the basket button: WhatsApp number and payment code. */
+  whatsappNumber: string
+  whatsappNote: string
+  momoCode: string
+  momoName: string
+  showContactBar: boolean
+
+  /** Prefixed to every price, e.g. RWF. */
+  currency: string
+
   footerNote: string
   showCategoryStrip: boolean
 }
@@ -65,13 +75,23 @@ export interface Product {
   id: string
   sectionId: string
   name: string
-  price: string
-  oldPrice: string
+  /** Plain number so the cart can add things up; the currency comes from
+   *  settings. 0 means no price is shown. */
+  price: number
+  oldPrice: number
+  /** How many are left. 0 shows as out of stock and blocks adding to a cart. */
+  stock: number
   badge: string
   description: string
   media: MediaItem[]
   visible: boolean
   order: number
+}
+
+/** One line in the shopper's basket. Kept in the browser, never in Firestore. */
+export interface CartLine {
+  productId: string
+  quantity: number
 }
 
 /** The small promo strip under the products ("free delivery", "gift wrap", ...). */
@@ -112,6 +132,12 @@ export const emptySettings: SiteSettings = {
   address: '',
   openingHours: '',
   socials: { facebook: '', instagram: '', twitter: '', tiktok: '', youtube: '', whatsapp: '' },
+  whatsappNumber: '',
+  whatsappNote: '',
+  momoCode: '',
+  momoName: '',
+  showContactBar: true,
+  currency: 'RWF',
   footerNote: '',
   showCategoryStrip: true,
 }

@@ -24,7 +24,7 @@ export default function CategoryStrip({ sections }: { sections: Section[] }) {
                 </span>
               )}
             </span>
-            <span className="truncate text-xs font-medium text-ink-600">{s.title}</span>
+            <span className="line-clamp-2 text-xs font-medium leading-tight text-ink-600">{s.title}</span>
           </a>
         ))}
       </div>
