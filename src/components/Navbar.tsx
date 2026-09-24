@@ -76,6 +76,7 @@ export default function Navbar({ settings, sections }: { settings: SiteSettings;
             </a>
           ))}
           <a href="#contact" className="shrink-0 transition hover:text-ink-900">Contact</a>
+          <Link to="/admin" className="ml-auto shrink-0 text-ink-400 transition hover:text-ink-900">Admin</Link>
         </div>
       </nav>
 
