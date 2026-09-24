@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Menu, ShoppingBag, ShoppingCart, X } from 'lucide-react'
+import { Menu, ShoppingCart, X } from 'lucide-react'
 import type { Section, SiteSettings } from '../types'
 import { SITE_NAME } from '../lib/config'
 import { useCart } from '../context/CartContext'
@@ -25,13 +25,7 @@ export default function Navbar({ settings, sections }: { settings: SiteSettings;
           </button>
 
           <Link to="/" className="flex min-w-0 flex-1 items-center gap-2">
-            {settings.logoUrl ? (
-              <img src={settings.logoUrl} alt="" className="h-8 w-8 shrink-0 rounded-lg object-cover sm:h-9 sm:w-9" />
-            ) : (
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink-900 text-white sm:h-9 sm:w-9">
-                <ShoppingBag size={18} />
-              </span>
-            )}
+            <img src="/logo.svg" alt="" className="h-8 w-8 shrink-0 rounded-lg object-cover sm:h-9 sm:w-9" />
             <span className="flex min-w-0 flex-col leading-tight">
               <span className="line-clamp-2 font-display text-xs font-bold leading-tight text-ink-900 sm:text-lg">
                 {settings.siteName || SITE_NAME}
