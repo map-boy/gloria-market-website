@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Film, Image as ImageIcon, Layers, Package } from 'lucide-react'
+﻿import { ArrowRight, Check, Film, Image as ImageIcon, Layers, Package } from 'lucide-react'
 import type { Product, Section, SiteSettings } from '../../types'
 import type { PanelId } from '../nav'
 import { setupProgress, setupSteps } from '../setup'
@@ -56,33 +56,28 @@ export default function OverviewPanel({ settings, sections, products, onNavigate
         </button>
       )}
 
-      <Card
-        title="Setting up your page"
-        description={progress === 100 ? 'All done — your page is complete.' : `${progress}% complete`}
-      >
-        <ul className="space-y-1">
-          {steps.map((s) => (
-            <li key={s.label}>
-              <button
-                onClick={() => onNavigate(s.panel)}
-                className="group flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition hover:bg-ink-50"
-              >
-                <span
-                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition ${
-                    s.done ? 'border-ink-900 bg-ink-900 text-white' : 'border-ink-200 text-transparent'
-                  }`}
-                >
-                  <Check size={13} />
-                </span>
-                <span className={`flex-1 text-sm ${s.done ? 'text-ink-400 line-through' : 'text-ink-800'}`}>
-                  {s.label}
-                </span>
-                <ArrowRight size={15} className="text-ink-200 transition group-hover:text-ink-600" />
-              </button>
-            </li>
-          ))}
-        </ul>
-      </Card>
+      {progress < 100 && (
+        <Card title="Setting up your page" description={`${progress}% complete`}>
+          <ul className="space-y-1">
+            {steps
+              .filter((s) => !s.done)
+              .map((s) => (
+                <li key={s.label}>
+                  <button
+                    onClick={() => onNavigate(s.panel)}
+                    className="group flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition hover:bg-ink-50"
+                  >
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-ink-200 text-transparent">
+                      <Check size={13} />
+                    </span>
+                    <span className="flex-1 text-sm text-ink-800">{s.label}</span>
+                    <ArrowRight size={15} className="text-ink-200 transition group-hover:text-ink-600" />
+                  </button>
+                </li>
+              ))}
+          </ul>
+        </Card>
+      )}
     </>
   )
 }
